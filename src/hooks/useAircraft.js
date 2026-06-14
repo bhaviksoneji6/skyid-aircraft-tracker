@@ -8,5 +8,6 @@ export function useAircraft(location) {
     enabled: !!location,
     refetchInterval: 15000,
     staleTime: 10000,
+    retry: 1,
   })
 }
