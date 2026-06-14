@@ -29,7 +29,7 @@ Open the app, allow location access, and see every aircraft currently overhead o
 
 ## Build Checklist
 
-- [ ] **Component 1** — Project scaffold (Vite + React + Tailwind)
+- [x] **Component 1** — Project scaffold (Vite + React + Tailwind)
 - [ ] **Component 2** — Map view with user location
 - [ ] **Component 3** — Live plane markers (OpenSky integration)
 - [ ] **Component 4** — Click a plane → info panel (callsign, altitude, speed)
@@ -47,7 +47,7 @@ Open the app, allow location access, and see every aircraft currently overhead o
 git clone https://github.com/bhaviksoneji6/skyid-aircraft-tracker.git
 cd skyid-aircraft-tracker
 
-# Install dependencies (once scaffold is set up)
+# Install dependencies
 npm install
 
 # Start dev server
