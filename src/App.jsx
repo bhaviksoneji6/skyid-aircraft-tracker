@@ -28,7 +28,14 @@ function AppContent() {
     )
   }
 
-  return <Map location={location} onPlaneClick={setSelectedPlane} selectedPlane={selectedPlane} />
+  return (
+    <Map
+      location={location}
+      onPlaneClick={setSelectedPlane}
+      selectedPlane={selectedPlane}
+      onPanelClose={() => setSelectedPlane(null)}
+    />
+  )
 }
 
 export default function App() {

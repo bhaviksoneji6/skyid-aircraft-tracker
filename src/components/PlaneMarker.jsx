@@ -20,15 +20,18 @@ function PlaneSVG({ color }) {
   )
 }
 
-export default function PlaneMarker({ aircraft, onClick }) {
+export default function PlaneMarker({ aircraft, onClick, selected }) {
   const color = altitudeColor(aircraft.altitude)
 
   return (
     <div
       onClick={() => onClick(aircraft)}
       title={aircraft.callsign}
-      className="cursor-pointer hover:scale-125 transition-transform duration-150"
-      style={{ transform: `rotate(${aircraft.heading}deg)` }}
+      className="cursor-pointer transition-transform duration-150"
+      style={{
+        transform: `rotate(${aircraft.heading}deg) scale(${selected ? 1.5 : 1})`,
+        filter: selected ? 'drop-shadow(0 0 6px white)' : undefined,
+      }}
     >
       <PlaneSVG color={color} />
     </div>

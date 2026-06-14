@@ -3,10 +3,11 @@ import { Map as MapLibre, Marker, NavigationControl } from 'react-map-gl/maplibr
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useAircraft } from '../hooks/useAircraft'
 import PlaneMarker from './PlaneMarker'
+import InfoPanel from './InfoPanel'
 
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
 
-export default function Map({ location, onPlaneClick }) {
+export default function Map({ location, onPlaneClick, selectedPlane, onPanelClose }) {
   const mapRef = useRef(null)
   const { data: aircraft = [], isFetching } = useAircraft(location)
 
@@ -35,7 +36,7 @@ export default function Map({ location, onPlaneClick }) {
             latitude={plane.lat}
             anchor="center"
           >
-            <PlaneMarker aircraft={plane} onClick={onPlaneClick} />
+            <PlaneMarker aircraft={plane} onClick={onPlaneClick} selected={selectedPlane?.icao24 === plane.icao24} />
           </Marker>
         ))}
       </MapLibre>
@@ -60,6 +61,8 @@ export default function Map({ location, onPlaneClick }) {
           </div>
         ))}
       </div>
+
+      <InfoPanel plane={selectedPlane} onClose={onPanelClose} />
     </div>
   )
 }
