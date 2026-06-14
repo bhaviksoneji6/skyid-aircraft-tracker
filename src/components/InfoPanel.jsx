@@ -1,4 +1,5 @@
 import { getAirlineName } from '../api/airlines'
+import { useAircraftMeta } from '../hooks/useAircraftMeta'
 
 function headingLabel(deg) {
   const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
@@ -15,7 +16,16 @@ function Row({ label, value, valueClass = 'text-white' }) {
   return (
     <div className="flex justify-between items-center py-2.5 border-b border-gray-800 last:border-0">
       <span className="text-gray-400 text-sm">{label}</span>
-      <span className={`text-sm font-medium ${valueClass}`}>{value}</span>
+      <span className={`text-sm font-medium text-right max-w-44 ${valueClass}`}>{value}</span>
+    </div>
+  )
+}
+
+function Section({ title, children }) {
+  return (
+    <div className="mb-1">
+      <p className="text-xs text-gray-600 uppercase tracking-widest pt-3 pb-1">{title}</p>
+      {children}
     </div>
   )
 }
@@ -26,6 +36,8 @@ export default function InfoPanel({ plane, onClose }) {
   const airline = getAirlineName(plane.callsign)
   const altFt = plane.altitude ? `${Math.round(plane.altitude * 3.281).toLocaleString()} ft` : 'N/A'
   const vertical = verticalLabel(plane.verticalRate)
+
+  const { data: meta, isLoading: metaLoading } = useAircraftMeta(plane.icao24)
 
   return (
     <div className="absolute top-0 right-0 h-full w-80 bg-gray-950/95 backdrop-blur-md border-l border-gray-800 z-10 flex flex-col shadow-2xl">
@@ -43,13 +55,36 @@ export default function InfoPanel({ plane, onClose }) {
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5 py-2">
-        <Row label="Altitude" value={altFt} />
-        <Row label="Speed" value={`${plane.speed} kts`} />
-        <Row label="Heading" value={`${Math.round(plane.heading)}° ${headingLabel(plane.heading)}`} />
-        <Row label="Vertical" value={vertical.text} valueClass={vertical.color} />
-        <Row label="Country" value={plane.country} />
-        <Row label="ICAO Hex" value={plane.icao24.toUpperCase()} valueClass="text-gray-300 font-mono" />
+      <div className="flex-1 overflow-y-auto px-5 py-1">
+        <Section title="Flight">
+          <Row label="Altitude" value={altFt} />
+          <Row label="Speed" value={`${plane.speed} kts`} />
+          <Row label="Heading" value={`${Math.round(plane.heading)}° ${headingLabel(plane.heading)}`} />
+          <Row label="Vertical" value={vertical.text} valueClass={vertical.color} />
+        </Section>
+
+        <Section title="Aircraft">
+          {metaLoading ? (
+            <p className="text-gray-600 text-sm py-2">Loading registration data...</p>
+          ) : meta ? (
+            <>
+              {meta.registration && <Row label="Registration" value={meta.registration} valueClass="text-yellow-300 font-mono" />}
+              {meta.manufacturer && <Row label="Manufacturer" value={meta.manufacturer} />}
+              {meta.model && <Row label="Model" value={meta.model} />}
+              {meta.typecode && <Row label="Type" value={meta.typecode} valueClass="text-gray-300 font-mono" />}
+              {meta.yearBuilt && <Row label="Year Built" value={meta.yearBuilt} />}
+              {meta.engines && <Row label="Engines" value={meta.engines} />}
+              {meta.owner && <Row label="Owner" value={meta.owner} />}
+            </>
+          ) : (
+            <p className="text-gray-600 text-sm py-2">No registration data available</p>
+          )}
+        </Section>
+
+        <Section title="Identifiers">
+          <Row label="ICAO Hex" value={plane.icao24.toUpperCase()} valueClass="text-gray-300 font-mono" />
+          <Row label="Country" value={plane.country} />
+        </Section>
       </div>
 
       <div className="px-5 py-3 border-t border-gray-800">
