@@ -1,0 +1,32 @@
+const BBOX_DEGREES = 2.5
+
+export async function fetchAircraft(lat, lon) {
+  const lamin = lat - BBOX_DEGREES
+  const lamax = lat + BBOX_DEGREES
+  const lomin = lon - BBOX_DEGREES
+  const lomax = lon + BBOX_DEGREES
+
+  const url = `https://opensky-network.org/api/states/all?lamin=${lamin}&lomin=${lomin}&lamax=${lamax}&lomax=${lomax}`
+  const res = await fetch(url)
+
+  if (!res.ok) throw new Error('OpenSky fetch failed')
+
+  const data = await res.json()
+
+  if (!data.states) return []
+
+  return data.states
+    .filter((s) => s[5] !== null && s[6] !== null && !s[8])
+    .map((s) => ({
+      icao24: s[0],
+      callsign: s[1]?.trim() || 'N/A',
+      country: s[2],
+      lon: s[5],
+      lat: s[6],
+      altitude: s[7] ?? s[13] ?? 0,
+      onGround: s[8],
+      speed: s[9] ? Math.round(s[9] * 1.944) : 0,
+      heading: s[10] ?? 0,
+      verticalRate: s[11] ?? 0,
+    }))
+}

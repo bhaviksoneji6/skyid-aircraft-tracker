@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Map from './components/Map'
 import { useLocation } from './hooks/useLocation'
@@ -6,6 +7,7 @@ const queryClient = new QueryClient()
 
 function AppContent() {
   const { location, error, loading } = useLocation()
+  const [selectedPlane, setSelectedPlane] = useState(null)
 
   if (loading) {
     return (
@@ -26,7 +28,7 @@ function AppContent() {
     )
   }
 
-  return <Map location={location} />
+  return <Map location={location} onPlaneClick={setSelectedPlane} selectedPlane={selectedPlane} />
 }
 
 export default function App() {
