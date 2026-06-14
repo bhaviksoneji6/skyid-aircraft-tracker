@@ -30,3 +30,14 @@ export async function fetchAircraft(lat, lon) {
       verticalRate: s[11] ?? 0,
     }))
 }
+
+export async function fetchTrack(icao24) {
+  const url = `https://opensky-network.org/api/tracks/all?icao24=${icao24}&time=0`
+  const res = await fetch(url)
+  if (!res.ok) throw new Error('Track fetch failed')
+  const data = await res.json()
+  if (!data.path?.length) return []
+  return data.path
+    .filter((p) => p[1] !== null && p[2] !== null)
+    .map((p) => [p[2], p[1]])
+}

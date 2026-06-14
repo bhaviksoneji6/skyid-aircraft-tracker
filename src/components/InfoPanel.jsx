@@ -1,3 +1,5 @@
+import { getAirlineName } from '../api/airlines'
+
 function headingLabel(deg) {
   const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
   return dirs[Math.round(deg / 45) % 8]
@@ -21,6 +23,7 @@ function Row({ label, value, valueClass = 'text-white' }) {
 export default function InfoPanel({ plane, onClose }) {
   if (!plane) return null
 
+  const airline = getAirlineName(plane.callsign)
   const altFt = plane.altitude ? `${Math.round(plane.altitude * 3.281).toLocaleString()} ft` : 'N/A'
   const vertical = verticalLabel(plane.verticalRate)
 
@@ -30,6 +33,7 @@ export default function InfoPanel({ plane, onClose }) {
         <div>
           <p className="text-xs text-gray-500 uppercase tracking-widest mb-0.5">Callsign</p>
           <h2 className="text-2xl font-bold text-white tracking-wide">{plane.callsign}</h2>
+          {airline && <p className="text-sm text-blue-400 mt-0.5">{airline}</p>}
         </div>
         <button
           onClick={onClose}
@@ -48,8 +52,11 @@ export default function InfoPanel({ plane, onClose }) {
         <Row label="ICAO Hex" value={plane.icao24.toUpperCase()} valueClass="text-gray-300 font-mono" />
       </div>
 
-      <div className="px-5 py-4 border-t border-gray-800">
-        <p className="text-xs text-gray-600 text-center">More details coming in next update</p>
+      <div className="px-5 py-3 border-t border-gray-800">
+        <div className="flex items-center gap-2 text-xs text-gray-500">
+          <div className="w-6 border-t-2 border-blue-400 border-dashed" />
+          <span>Dashed line shows flight path</span>
+        </div>
       </div>
     </div>
   )
