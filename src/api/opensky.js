@@ -9,6 +9,7 @@ export async function fetchAircraft(lat, lon) {
   const url = `https://opensky-network.org/api/states/all?lamin=${lamin}&lomin=${lomin}&lamax=${lamax}&lomax=${lomax}`
   const res = await fetch(url)
 
+  if (res.status === 429) throw new Error('RATE_LIMITED')
   if (!res.ok) throw new Error('OpenSky fetch failed')
 
   const data = await res.json()

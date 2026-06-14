@@ -21,15 +21,14 @@ const trackLayerStyle = {
 
 export default function Map({ location, onPlaneClick, selectedPlane, onPanelClose }) {
   const mapRef = useRef(null)
-  const { data: aircraft = [], isFetching } = useAircraft(location)
+  const { data: aircraft = [], isFetching, error } = useAircraft(location)
   const { data: track = [] } = useFlightTrack(selectedPlane?.icao24)
+
+  const isRateLimited = error?.message === 'RATE_LIMITED'
 
   const trackGeoJSON = {
     type: 'Feature',
-    geometry: {
-      type: 'LineString',
-      coordinates: track,
-    },
+    geometry: { type: 'LineString', coordinates: track },
   }
 
   return (
@@ -72,16 +71,18 @@ export default function Map({ location, onPlaneClick, selectedPlane, onPanelClos
         ))}
       </MapLibre>
 
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-gray-900/80 backdrop-blur-sm text-white text-sm px-4 py-2 rounded-full border border-gray-700">
-        {isFetching ? (
+      <div className="absolute top-4 left-4 bg-gray-900/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-gray-700">
+        <span className="text-white font-semibold text-sm tracking-wide">SkyID</span>
+      </div>
+
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-gray-900/80 backdrop-blur-sm text-white text-sm px-4 py-2 rounded-full border border-gray-700 whitespace-nowrap">
+        {isRateLimited ? (
+          <span className="text-yellow-400">Rate limited — retrying soon</span>
+        ) : isFetching ? (
           <span className="text-gray-400">Updating...</span>
         ) : (
           <span>{aircraft.length} aircraft nearby</span>
         )}
-      </div>
-
-      <div className="absolute top-4 left-4 bg-gray-900/80 backdrop-blur-sm px-3 py-1.5 rounded-lg border border-gray-700">
-        <span className="text-white font-semibold text-sm tracking-wide">SkyID</span>
       </div>
 
       <div className="absolute bottom-14 left-4 bg-gray-900/70 backdrop-blur-sm rounded-lg border border-gray-700 px-3 py-2 flex flex-col gap-1.5 text-xs">
