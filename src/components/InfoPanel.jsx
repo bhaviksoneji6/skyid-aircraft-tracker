@@ -1,5 +1,6 @@
 import { getAirlineName } from '../api/airlines'
 import { useAircraftMeta } from '../hooks/useAircraftMeta'
+import { useAircraftPhoto } from '../hooks/useAircraftPhoto'
 
 function headingLabel(deg) {
   const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
@@ -38,21 +39,51 @@ export default function InfoPanel({ plane, onClose }) {
   const vertical = verticalLabel(plane.verticalRate)
 
   const { data: meta, isLoading: metaLoading } = useAircraftMeta(plane.icao24)
+  const { data: photo } = useAircraftPhoto(plane.icao24)
 
   return (
     <div className="absolute top-0 right-0 h-full w-80 bg-gray-950/95 backdrop-blur-md border-l border-gray-800 z-10 flex flex-col shadow-2xl">
-      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
-        <div>
-          <p className="text-xs text-gray-500 uppercase tracking-widest mb-0.5">Callsign</p>
-          <h2 className="text-2xl font-bold text-white tracking-wide">{plane.callsign}</h2>
-          {airline && <p className="text-sm text-blue-400 mt-0.5">{airline}</p>}
+
+      {photo ? (
+        <div className="relative w-full h-44 flex-shrink-0 overflow-hidden">
+          <img
+            src={photo.thumbnail}
+            alt={plane.callsign}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/20 to-transparent" />
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 text-white/70 hover:text-white bg-black/40 hover:bg-black/60 transition-colors w-7 h-7 flex items-center justify-center rounded-full text-sm"
+          >
+            ✕
+          </button>
+          {photo.photographer && (
+            <a
+              href={photo.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="absolute bottom-2 right-3 text-xs text-white/50 hover:text-white/80 transition-colors"
+            >
+              © {photo.photographer}
+            </a>
+          )}
         </div>
-        <button
-          onClick={onClose}
-          className="text-gray-500 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-800"
-        >
-          ✕
-        </button>
+      ) : (
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800 flex-shrink-0">
+          <div className="w-12 h-12 rounded-lg bg-gray-800 flex items-center justify-center text-gray-500 text-xl">✈</div>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-800"
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
+      <div className="px-5 pt-3 pb-2 border-b border-gray-800 flex-shrink-0">
+        <h2 className="text-2xl font-bold text-white tracking-wide">{plane.callsign}</h2>
+        {airline && <p className="text-sm text-blue-400 mt-0.5">{airline}</p>}
       </div>
 
       <div className="flex-1 overflow-y-auto px-5 py-1">
@@ -87,7 +118,7 @@ export default function InfoPanel({ plane, onClose }) {
         </Section>
       </div>
 
-      <div className="px-5 py-3 border-t border-gray-800">
+      <div className="px-5 py-3 border-t border-gray-800 flex-shrink-0">
         <div className="flex items-center gap-2 text-xs text-gray-500">
           <div className="w-6 border-t-2 border-blue-400 border-dashed" />
           <span>Dashed line shows flight path</span>
