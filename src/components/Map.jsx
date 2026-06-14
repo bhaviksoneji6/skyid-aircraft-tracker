@@ -25,6 +25,7 @@ export default function Map({ location, onPlaneClick, selectedPlane, onPanelClos
   const { data: track = [] } = useFlightTrack(selectedPlane?.icao24)
 
   const isRateLimited = error?.message === 'RATE_LIMITED'
+  const hasError = !!error && !isRateLimited
 
   const trackGeoJSON = {
     type: 'Feature',
@@ -78,6 +79,8 @@ export default function Map({ location, onPlaneClick, selectedPlane, onPanelClos
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-gray-900/80 backdrop-blur-sm text-white text-sm px-4 py-2 rounded-full border border-gray-700 whitespace-nowrap">
         {isRateLimited ? (
           <span className="text-yellow-400">Rate limited — retrying soon</span>
+        ) : hasError ? (
+          <span className="text-red-400">Could not load aircraft data</span>
         ) : isFetching ? (
           <span className="text-gray-400">Updating...</span>
         ) : (

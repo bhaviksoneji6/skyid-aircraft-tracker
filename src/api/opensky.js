@@ -6,7 +6,7 @@ export async function fetchAircraft(lat, lon) {
   const lomin = lon - BBOX_DEGREES
   const lomax = lon + BBOX_DEGREES
 
-  const url = `https://opensky-network.org/api/states/all?lamin=${lamin}&lomin=${lomin}&lamax=${lamax}&lomax=${lomax}`
+  const url = `/api/aircraft?lamin=${lamin}&lomin=${lomin}&lamax=${lamax}&lomax=${lomax}`
   const res = await fetch(url)
 
   if (res.status === 429) throw new Error('RATE_LIMITED')
