@@ -8,11 +8,18 @@ export default async function handler(req, res) {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), 8000)
 
+  const credentials = Buffer.from(
+    `bhaviksoneji6:${process.env.OPENSKY_PASSWORD}`
+  ).toString('base64')
+
   try {
     const url = `https://opensky-network.org/api/states/all?lamin=${lamin}&lomin=${lomin}&lamax=${lamax}&lomax=${lomax}`
     const response = await fetch(url, {
       signal: controller.signal,
-      headers: { 'User-Agent': 'SkyID/1.0' },
+      headers: {
+        'Authorization': `Basic ${credentials}`,
+        'User-Agent': 'SkyID/1.0',
+      },
     })
 
     clearTimeout(timeout)
