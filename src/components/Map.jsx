@@ -1,36 +1,18 @@
 import { useRef } from 'react'
-import { Map as MapLibre, Marker, NavigationControl, Source, Layer } from 'react-map-gl/maplibre'
+import { Map as MapLibre, Marker, NavigationControl, AttributionControl } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useAircraft } from '../hooks/useAircraft'
-import { useFlightTrack } from '../hooks/useFlightTrack'
 import PlaneMarker from './PlaneMarker'
 import InfoPanel from './InfoPanel'
 
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json'
 
-const trackLayerStyle = {
-  id: 'flight-track',
-  type: 'line',
-  paint: {
-    'line-color': '#60a5fa',
-    'line-width': 2,
-    'line-opacity': 0.7,
-    'line-dasharray': [4, 2],
-  },
-}
-
 export default function Map({ location, onPlaneClick, selectedPlane, onPanelClose }) {
   const mapRef = useRef(null)
   const { data: aircraft = [], isFetching, error } = useAircraft(location)
-  const { data: track = [] } = useFlightTrack(selectedPlane?.icao24)
 
   const isRateLimited = error?.message === 'RATE_LIMITED'
   const hasError = !!error && !isRateLimited
-
-  const trackGeoJSON = {
-    type: 'Feature',
-    geometry: { type: 'LineString', coordinates: track },
-  }
 
   return (
     <div className="relative w-full h-full">
@@ -43,14 +25,14 @@ export default function Map({ location, onPlaneClick, selectedPlane, onPanelClos
         }}
         style={{ width: '100%', height: '100%' }}
         mapStyle={MAP_STYLE}
+        attributionControl={false}
       >
         <NavigationControl position="top-right" />
-
-        {track.length > 1 && (
-          <Source id="flight-track" type="geojson" data={trackGeoJSON}>
-            <Layer {...trackLayerStyle} />
-          </Source>
-        )}
+        <AttributionControl
+          position="bottom-right"
+          customAttribution="SkyID by Bhavik Soneji"
+          compact={true}
+        />
 
         <Marker longitude={location.lon} latitude={location.lat} anchor="center">
           <div className="w-4 h-4 rounded-full bg-blue-500 border-2 border-white shadow-lg shadow-blue-500/50" />

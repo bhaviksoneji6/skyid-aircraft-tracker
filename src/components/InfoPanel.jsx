@@ -146,12 +146,6 @@ export default function InfoPanel({ plane, onClose }) {
           </Section>
         </div>
 
-        <div className="px-5 py-3 border-t border-gray-800 flex-shrink-0">
-          <div className="flex items-center gap-2 text-xs text-gray-500">
-            <div className="w-6 border-t-2 border-blue-400 border-dashed" />
-            <span>Dashed line shows flight path</span>
-          </div>
-        </div>
       </div>
     </>
   )
