@@ -24,5 +24,6 @@ export async function fetchAircraft(lat, lon) {
       description: a.desc ?? null,
       operator: a.ownOp ?? null,
       year: a.year ?? null,
+      category: a.category ?? null,
     }))
 }

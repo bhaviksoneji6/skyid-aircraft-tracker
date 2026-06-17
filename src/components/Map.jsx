@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { Map as MapLibre, Marker, NavigationControl, AttributionControl } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { useAircraft } from '../hooks/useAircraft'
+import { useInterpolatedAircraft } from '../hooks/useInterpolatedAircraft'
 import PlaneMarker from './PlaneMarker'
 import InfoPanel from './InfoPanel'
 
@@ -9,7 +9,7 @@ const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json'
 
 export default function Map({ location, onPlaneClick, selectedPlane, onPanelClose }) {
   const mapRef = useRef(null)
-  const { data: aircraft = [], isFetching, error } = useAircraft(location)
+  const { data: aircraft = [], isFetching, error } = useInterpolatedAircraft(location)
 
   const isRateLimited = error?.message === 'RATE_LIMITED'
   const hasError = !!error && !isRateLimited
