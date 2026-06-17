@@ -6,7 +6,7 @@ import { useFlightTrack } from '../hooks/useFlightTrack'
 import PlaneMarker from './PlaneMarker'
 import InfoPanel from './InfoPanel'
 
-const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json'
 
 const trackLayerStyle = {
   id: 'flight-track',
