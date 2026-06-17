@@ -102,6 +102,22 @@ export default function InfoPanel({ plane, onClose }) {
           <Section title="Identifiers">
             <Row label="ICAO Hex" value={plane.icao24.toUpperCase()} valueClass="text-gray-300 font-mono" />
           </Section>
+
+          {plane.callsign && plane.callsign !== 'N/A' && (
+            <a
+              href={`https://www.flightaware.com/live/flight/${encodeURIComponent(plane.callsign.trim())}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 mb-4 flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-blue-600/20 hover:bg-blue-600/35 border border-blue-600/40 text-blue-400 hover:text-blue-300 text-sm font-medium transition-colors"
+            >
+              Track on FlightAware
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                <polyline points="15 3 21 3 21 9" />
+                <line x1="10" y1="14" x2="21" y2="3" />
+              </svg>
+            </a>
+          )}
         </div>
       </div>
     </>

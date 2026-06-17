@@ -1,3 +1,5 @@
+import { getAircraftType } from '../api/aircraftTypes'
+
 function altitudeColor(altitude) {
   if (altitude < 3000) return '#6b7280'
   if (altitude < 13000) return '#34d399'
@@ -5,15 +7,7 @@ function altitudeColor(altitude) {
   return '#e2e8f0'
 }
 
-function getAircraftType(category) {
-  if (!category) return 'jet'
-  if (category === 'A7') return 'helicopter'
-  if (category === 'B1') return 'glider'
-  if (category === 'A6') return 'military'
-  if (category === 'A1' || category === 'A2') return 'prop'
-  return 'jet'
-}
-
+// Swept wings — commercial and regional jets
 function JetIcon({ color }) {
   return (
     <path
@@ -23,15 +17,32 @@ function JetIcon({ color }) {
   )
 }
 
-function PropIcon({ color }) {
+// Straight wings + twin engine pods — ATR, Q400, PC-12, Caravan
+function TurbopropIcon({ color }) {
   return (
-    <path
-      fill={color}
-      d="M12 2.5a1.5 1.5 0 0 0-1.5 1.5V8L2 11.5v2L10.5 12v5.5L8 19v2l4-1 4 1v-2l-2.5-1.5V12L22 13.5v-2L13.5 8V4A1.5 1.5 0 0 0 12 2.5z"
-    />
+    <>
+      <rect fill={color} x="10.5" y="2" width="3" height="20" rx="1.5" />
+      <rect fill={color} x="1.5" y="9" width="21" height="3.5" rx="1" />
+      <rect fill={color} x="3.5" y="8" width="4" height="5.5" rx="2" />
+      <rect fill={color} x="16.5" y="8" width="4" height="5.5" rx="2" />
+      <rect fill={color} x="7.5" y="18.5" width="9" height="2.5" rx="1" />
+    </>
   )
 }
 
+// Straight wings + prop bar at nose — Cessna, Piper, general aviation
+function LightIcon({ color }) {
+  return (
+    <>
+      <rect fill={color} x="8" y="2" width="8" height="2" rx="1" />
+      <rect fill={color} x="10.5" y="2" width="3" height="20" rx="1.5" />
+      <rect fill={color} x="2.5" y="10.5" width="19" height="3" rx="1" />
+      <rect fill={color} x="8" y="18.5" width="8" height="2.5" rx="1" />
+    </>
+  )
+}
+
+// Cross rotor — helicopters
 function HelicopterIcon({ color }) {
   return (
     <>
@@ -42,6 +53,7 @@ function HelicopterIcon({ color }) {
   )
 }
 
+// Delta / arrowhead — military jets
 function MilitaryIcon({ color }) {
   return (
     <path
@@ -51,6 +63,17 @@ function MilitaryIcon({ color }) {
   )
 }
 
+// Swept wings + aft engine pods — bizjets, private jets, charters (Gulfstream, Citation, Learjet)
+function BizjetIcon({ color }) {
+  return (
+    <path
+      fill={color}
+      d="M12 2 L13 3 L13 8 L20 12 L20 13.5 L13 11 L13 15 L16 16 L16 19.5 L14 19 L13 20.5 L13 22 L11 22 L11 20.5 L10 19 L8 19.5 L8 16 L11 15 L11 11 L4 13.5 L4 12 L11 8 L11 3 Z"
+    />
+  )
+}
+
+// Extreme wingspan, tiny fuselage — gliders
 function GliderIcon({ color }) {
   return (
     <path
@@ -62,7 +85,9 @@ function GliderIcon({ color }) {
 
 const ICONS = {
   jet: JetIcon,
-  prop: PropIcon,
+  bizjet: BizjetIcon,
+  turboprop: TurbopropIcon,
+  light: LightIcon,
   helicopter: HelicopterIcon,
   military: MilitaryIcon,
   glider: GliderIcon,
@@ -70,7 +95,7 @@ const ICONS = {
 
 export default function PlaneMarker({ aircraft, onClick, selected }) {
   const color = altitudeColor(aircraft.altitude)
-  const type = getAircraftType(aircraft.category)
+  const type = getAircraftType(aircraft.category, aircraft.typecode)
   const Icon = ICONS[type]
 
   return (
