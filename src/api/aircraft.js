@@ -21,16 +21,9 @@ export async function fetchAircraft(lat, lon) {
       verticalRate: a.baro_rate ?? 0,
       registration: a.r ?? null,
       typecode: a.t ?? null,
+      description: a.desc ?? null,
+      operator: a.ownOp ?? null,
+      year: a.year ?? null,
+      category: a.category ?? null,
     }))
-}
-
-export async function fetchTrack(icao24) {
-  const url = `https://opensky-network.org/api/tracks/all?icao24=${icao24}&time=0`
-  const res = await fetch(url)
-  if (!res.ok) return []
-  const data = await res.json()
-  if (!data.path?.length) return []
-  return data.path
-    .filter((p) => p[1] !== null && p[2] !== null)
-    .map((p) => [p[2], p[1]])
 }

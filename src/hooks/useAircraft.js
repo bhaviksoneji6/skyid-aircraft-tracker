@@ -6,7 +6,7 @@ export function useAircraft(location) {
     queryKey: ['aircraft', location?.lat, location?.lon],
     queryFn: () => fetchAircraft(location.lat, location.lon),
     enabled: !!location,
-    refetchInterval: 6000,
+    refetchInterval: 3000,
     staleTime: 10000,
     retry: 1,
   })
