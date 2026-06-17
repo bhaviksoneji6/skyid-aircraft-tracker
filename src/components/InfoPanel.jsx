@@ -1,7 +1,5 @@
 import { getAirlineName } from '../api/airlines'
-import { useAircraftMeta } from '../hooks/useAircraftMeta'
 import { useAircraftPhoto } from '../hooks/useAircraftPhoto'
-import { useFlightRoute } from '../hooks/useFlightRoute'
 
 function headingLabel(deg) {
   const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
@@ -38,20 +36,11 @@ export default function InfoPanel({ plane, onClose }) {
   const airline = getAirlineName(plane.callsign)
   const altFt = plane.altitude ? `${Math.round(plane.altitude).toLocaleString()} ft` : 'N/A'
   const vertical = verticalLabel(plane.verticalRate)
-
-  const { data: meta, isLoading: metaLoading } = useAircraftMeta(plane.icao24)
   const { data: photo } = useAircraftPhoto(plane.icao24)
-  const { data: route } = useFlightRoute(plane.callsign)
-
-  const registration = plane.registration ?? meta?.registration ?? null
-  const typecode = plane.typecode ?? meta?.typecode ?? null
 
   return (
     <>
-      <div
-        className="absolute inset-0 bg-black/40 z-10 sm:hidden"
-        onClick={onClose}
-      />
+      <div className="absolute inset-0 bg-black/40 z-10 sm:hidden" onClick={onClose} />
 
       <div
         key={plane.icao24}
@@ -72,12 +61,8 @@ export default function InfoPanel({ plane, onClose }) {
               ✕
             </button>
             {photo.photographer && (
-              <a
-                href={photo.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="absolute bottom-2 right-3 text-xs text-white/50 hover:text-white/80 transition-colors"
-              >
+              <a href={photo.link} target="_blank" rel="noopener noreferrer"
+                className="absolute bottom-2 right-3 text-xs text-white/50 hover:text-white/80 transition-colors">
                 © {photo.photographer}
               </a>
             )}
@@ -85,10 +70,8 @@ export default function InfoPanel({ plane, onClose }) {
         ) : (
           <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800 flex-shrink-0">
             <div className="w-10 h-10 rounded-lg bg-gray-800 flex items-center justify-center text-gray-500 text-lg">✈</div>
-            <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-800"
-            >
+            <button onClick={onClose}
+              className="text-gray-500 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-800">
               ✕
             </button>
           </div>
@@ -96,20 +79,8 @@ export default function InfoPanel({ plane, onClose }) {
 
         <div className="px-5 pt-3 pb-2 border-b border-gray-800 flex-shrink-0">
           <h2 className="text-xl font-bold text-white tracking-wide">{plane.callsign}</h2>
-          {airline && <p className="text-sm text-blue-400 mt-0.5">{airline}</p>}
-          {route && (
-            <div className="flex items-center gap-2 mt-2">
-              <span className="text-xs font-mono bg-gray-800 text-gray-200 px-2 py-0.5 rounded">
-                {route.origin?.iata_code ?? '???'}
-              </span>
-              <span className="text-gray-600 text-xs">→</span>
-              <span className="text-xs font-mono bg-gray-800 text-gray-200 px-2 py-0.5 rounded">
-                {route.destination?.iata_code ?? '???'}
-              </span>
-              <span className="text-xs text-gray-500 truncate">
-                {route.origin?.municipality} → {route.destination?.municipality}
-              </span>
-            </div>
+          {(plane.operator || airline) && (
+            <p className="text-sm text-blue-400 mt-0.5">{plane.operator ?? airline}</p>
           )}
         </div>
 
@@ -122,30 +93,16 @@ export default function InfoPanel({ plane, onClose }) {
           </Section>
 
           <Section title="Aircraft">
-            {registration && <Row label="Registration" value={registration} valueClass="text-yellow-300 font-mono" />}
-            {typecode && <Row label="Type" value={typecode} valueClass="text-gray-300 font-mono" />}
-            {metaLoading ? (
-              <div className="space-y-2 py-2">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-4 bg-gray-800 rounded animate-pulse" />
-                ))}
-              </div>
-            ) : meta ? (
-              <>
-                {meta.manufacturer && <Row label="Manufacturer" value={meta.manufacturer} />}
-                {meta.model && <Row label="Model" value={meta.model} />}
-                {meta.yearBuilt && <Row label="Year Built" value={meta.yearBuilt} />}
-                {meta.engines && <Row label="Engines" value={meta.engines} />}
-                {meta.owner && <Row label="Owner" value={meta.owner} />}
-              </>
-            ) : null}
+            {plane.description && <Row label="Aircraft" value={plane.description} />}
+            {plane.registration && <Row label="Registration" value={plane.registration} valueClass="text-yellow-300 font-mono" />}
+            {plane.typecode && <Row label="Type Code" value={plane.typecode} valueClass="text-gray-300 font-mono" />}
+            {plane.year && <Row label="Year Built" value={plane.year} />}
           </Section>
 
           <Section title="Identifiers">
             <Row label="ICAO Hex" value={plane.icao24.toUpperCase()} valueClass="text-gray-300 font-mono" />
           </Section>
         </div>
-
       </div>
     </>
   )

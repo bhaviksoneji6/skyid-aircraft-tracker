@@ -21,5 +21,8 @@ export async function fetchAircraft(lat, lon) {
       verticalRate: a.baro_rate ?? 0,
       registration: a.r ?? null,
       typecode: a.t ?? null,
+      description: a.desc ?? null,
+      operator: a.ownOp ?? null,
+      year: a.year ?? null,
     }))
 }
