@@ -1,7 +1,7 @@
 function altitudeColor(altitude) {
-  if (altitude < 1000) return '#6b7280'
-  if (altitude < 4000) return '#34d399'
-  if (altitude < 9000) return '#fbbf24'
+  if (altitude < 3000) return '#6b7280'
+  if (altitude < 13000) return '#34d399'
+  if (altitude < 30000) return '#fbbf24'
   return '#e2e8f0'
 }
 

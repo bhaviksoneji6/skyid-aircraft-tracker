@@ -6,7 +6,7 @@ import { useFlightTrack } from '../hooks/useFlightTrack'
 import PlaneMarker from './PlaneMarker'
 import InfoPanel from './InfoPanel'
 
-const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json'
+const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json'
 
 const trackLayerStyle = {
   id: 'flight-track',
@@ -89,7 +89,7 @@ export default function Map({ location, onPlaneClick, selectedPlane, onPanelClos
       </div>
 
       <div className="absolute bottom-14 left-4 bg-gray-900/70 backdrop-blur-sm rounded-lg border border-gray-700 px-3 py-2 flex flex-col gap-1.5 text-xs">
-        {[['#e2e8f0', '9000m+'], ['#fbbf24', '4000–9000m'], ['#34d399', '1000–4000m'], ['#6b7280', 'Low / Ground']].map(([color, label]) => (
+        {[['#e2e8f0', '30,000ft+'], ['#fbbf24', '13,000–30,000ft'], ['#34d399', '3,000–13,000ft'], ['#6b7280', 'Low / Ground']].map(([color, label]) => (
           <div key={label} className="flex items-center gap-2">
             <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
             <span className="text-gray-300">{label}</span>

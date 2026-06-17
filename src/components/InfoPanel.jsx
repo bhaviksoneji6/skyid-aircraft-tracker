@@ -1,6 +1,7 @@
 import { getAirlineName } from '../api/airlines'
 import { useAircraftMeta } from '../hooks/useAircraftMeta'
 import { useAircraftPhoto } from '../hooks/useAircraftPhoto'
+import { useFlightRoute } from '../hooks/useFlightRoute'
 
 function headingLabel(deg) {
   const dirs = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW']
@@ -40,6 +41,7 @@ export default function InfoPanel({ plane, onClose }) {
 
   const { data: meta, isLoading: metaLoading } = useAircraftMeta(plane.icao24)
   const { data: photo } = useAircraftPhoto(plane.icao24)
+  const { data: route } = useFlightRoute(plane.callsign)
 
   const registration = plane.registration ?? meta?.registration ?? null
   const typecode = plane.typecode ?? meta?.typecode ?? null
@@ -95,6 +97,20 @@ export default function InfoPanel({ plane, onClose }) {
         <div className="px-5 pt-3 pb-2 border-b border-gray-800 flex-shrink-0">
           <h2 className="text-xl font-bold text-white tracking-wide">{plane.callsign}</h2>
           {airline && <p className="text-sm text-blue-400 mt-0.5">{airline}</p>}
+          {route && (
+            <div className="flex items-center gap-2 mt-2">
+              <span className="text-xs font-mono bg-gray-800 text-gray-200 px-2 py-0.5 rounded">
+                {route.origin?.iata_code ?? '???'}
+              </span>
+              <span className="text-gray-600 text-xs">→</span>
+              <span className="text-xs font-mono bg-gray-800 text-gray-200 px-2 py-0.5 rounded">
+                {route.destination?.iata_code ?? '???'}
+              </span>
+              <span className="text-xs text-gray-500 truncate">
+                {route.origin?.municipality} → {route.destination?.municipality}
+              </span>
+            </div>
+          )}
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-1">
