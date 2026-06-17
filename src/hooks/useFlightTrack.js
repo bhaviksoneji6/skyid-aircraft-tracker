@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { fetchTrack } from '../api/opensky'
+import { fetchTrack } from '../api/aircraft'
 
 export function useFlightTrack(icao24) {
   return useQuery({

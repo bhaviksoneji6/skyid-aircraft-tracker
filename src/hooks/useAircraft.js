@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { fetchAircraft } from '../api/opensky'
+import { fetchAircraft } from '../api/aircraft'
 
 export function useAircraft(location) {
   return useQuery({

@@ -8,8 +8,8 @@ function headingLabel(deg) {
 }
 
 function verticalLabel(rate) {
-  if (rate > 1) return { text: `+${Math.round(rate)} m/s`, color: 'text-green-400' }
-  if (rate < -1) return { text: `${Math.round(rate)} m/s`, color: 'text-red-400' }
+  if (rate > 100) return { text: `+${Math.round(rate)} ft/min`, color: 'text-green-400' }
+  if (rate < -100) return { text: `${Math.round(rate)} ft/min`, color: 'text-red-400' }
   return { text: 'Level', color: 'text-gray-400' }
 }
 
@@ -35,15 +35,17 @@ export default function InfoPanel({ plane, onClose }) {
   if (!plane) return null
 
   const airline = getAirlineName(plane.callsign)
-  const altFt = plane.altitude ? `${Math.round(plane.altitude * 3.281).toLocaleString()} ft` : 'N/A'
+  const altFt = plane.altitude ? `${Math.round(plane.altitude).toLocaleString()} ft` : 'N/A'
   const vertical = verticalLabel(plane.verticalRate)
 
   const { data: meta, isLoading: metaLoading } = useAircraftMeta(plane.icao24)
   const { data: photo } = useAircraftPhoto(plane.icao24)
 
+  const registration = plane.registration ?? meta?.registration ?? null
+  const typecode = plane.typecode ?? meta?.typecode ?? null
+
   return (
     <>
-      {/* Mobile overlay backdrop */}
       <div
         className="absolute inset-0 bg-black/40 z-10 sm:hidden"
         onClick={onClose}
@@ -59,11 +61,7 @@ export default function InfoPanel({ plane, onClose }) {
       >
         {photo ? (
           <div className="relative w-full h-40 flex-shrink-0 overflow-hidden sm:h-44 rounded-t-2xl sm:rounded-none">
-            <img
-              src={photo.thumbnail}
-              alt={plane.callsign}
-              className="w-full h-full object-cover"
-            />
+            <img src={photo.thumbnail} alt={plane.callsign} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/20 to-transparent" />
             <button
               onClick={onClose}
@@ -108,6 +106,8 @@ export default function InfoPanel({ plane, onClose }) {
           </Section>
 
           <Section title="Aircraft">
+            {registration && <Row label="Registration" value={registration} valueClass="text-yellow-300 font-mono" />}
+            {typecode && <Row label="Type" value={typecode} valueClass="text-gray-300 font-mono" />}
             {metaLoading ? (
               <div className="space-y-2 py-2">
                 {[1, 2, 3].map((i) => (
@@ -116,22 +116,17 @@ export default function InfoPanel({ plane, onClose }) {
               </div>
             ) : meta ? (
               <>
-                {meta.registration && <Row label="Registration" value={meta.registration} valueClass="text-yellow-300 font-mono" />}
                 {meta.manufacturer && <Row label="Manufacturer" value={meta.manufacturer} />}
                 {meta.model && <Row label="Model" value={meta.model} />}
-                {meta.typecode && <Row label="Type" value={meta.typecode} valueClass="text-gray-300 font-mono" />}
                 {meta.yearBuilt && <Row label="Year Built" value={meta.yearBuilt} />}
                 {meta.engines && <Row label="Engines" value={meta.engines} />}
                 {meta.owner && <Row label="Owner" value={meta.owner} />}
               </>
-            ) : (
-              <p className="text-gray-600 text-sm py-2">No registration data available</p>
-            )}
+            ) : null}
           </Section>
 
           <Section title="Identifiers">
             <Row label="ICAO Hex" value={plane.icao24.toUpperCase()} valueClass="text-gray-300 font-mono" />
-            <Row label="Country" value={plane.country} />
           </Section>
         </div>
 
