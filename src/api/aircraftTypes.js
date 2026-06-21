@@ -23,6 +23,13 @@ const HELI_EXACT = new Set([
   'HH60', 'MH60', 'SH60', 'UH60', 'CH47',
 ])
 
+// Description substrings that only appear in helicopter aircraft names
+// Used as a last-resort fallback when type code is unknown or category is bad data
+const HELI_DESC_KEYWORDS = [
+  'HELICOPTER', 'HELICOPTERS', 'ROTOR',
+  'EUROCOPTER', 'ROBINSON', 'SIKORSKY', 'AGUSTA', 'GUIMBAL', 'ENSTROM',
+]
+
 // Helicopter prefix patterns
 const HELI_PREFIXES = ['EC3', 'EC4', 'EC5', 'EC6', 'EC7', 'H12', 'H13', 'H14', 'H15', 'H16', 'H17', 'H22', 'AS3', 'AS5', 'AS6', 'AW', 'R2', 'R4', 'R6']
 
@@ -122,13 +129,16 @@ function matchesPrefix(tc, prefixes) {
 }
 
 // Returns one of: 'jet' | 'bizjet' | 'turboprop' | 'light' | 'helicopter' | 'military' | 'glider'
-export function getAircraftType(category, typecode) {
+export function getAircraftType(category, typecode, description) {
   const tc = typecode?.toUpperCase().trim() ?? ''
   const cat = category ?? ''
+  const desc = description?.toUpperCase() ?? ''
 
-  // Helicopters — category wins, type code fills gaps
+  // Helicopters — category A7, then type code, then description as last resort
+  // (catches unknown type codes and bad category data from the source)
   if (cat === 'A7') return 'helicopter'
   if (tc && (HELI_EXACT.has(tc) || matchesPrefix(tc, HELI_PREFIXES))) return 'helicopter'
+  if (desc && HELI_DESC_KEYWORDS.some((k) => desc.includes(k))) return 'helicopter'
 
   // Gliders
   if (cat === 'B1' || cat === 'B4') return 'glider'

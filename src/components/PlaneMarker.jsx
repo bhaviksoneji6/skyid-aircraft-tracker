@@ -1,10 +1,10 @@
 import { getAircraftType } from '../api/aircraftTypes'
 
 function altitudeColor(altitude) {
-  if (altitude < 3000) return '#6b7280'
-  if (altitude < 13000) return '#34d399'
-  if (altitude < 30000) return '#fbbf24'
-  return '#e2e8f0'
+  if (!altitude || altitude <= 500) return '#6b7280'
+  const t = Math.min((altitude - 500) / 39500, 1) // 500ft → 40,000ft
+  const hue = Math.round(t * 270)                  // red (0°) → violet (270°)
+  return `hsl(${hue}, 90%, 55%)`
 }
 
 // Swept wings — commercial and regional jets
@@ -95,7 +95,7 @@ const ICONS = {
 
 export default function PlaneMarker({ aircraft, onClick, selected }) {
   const color = altitudeColor(aircraft.altitude)
-  const type = getAircraftType(aircraft.category, aircraft.typecode)
+  const type = getAircraftType(aircraft.category, aircraft.typecode, aircraft.description)
   const Icon = ICONS[type]
 
   return (

@@ -70,13 +70,21 @@ export default function Map({ location, onPlaneClick, selectedPlane, onPanelClos
         )}
       </div>
 
-      <div className="absolute bottom-14 left-4 bg-gray-900/70 backdrop-blur-sm rounded-lg border border-gray-700 px-3 py-2 flex flex-col gap-1.5 text-xs">
-        {[['#e2e8f0', '30,000ft+'], ['#fbbf24', '13,000–30,000ft'], ['#34d399', '3,000–13,000ft'], ['#6b7280', 'Low / Ground']].map(([color, label]) => (
-          <div key={label} className="flex items-center gap-2">
-            <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
-            <span className="text-gray-300">{label}</span>
-          </div>
-        ))}
+      <div className="absolute bottom-14 left-4 bg-gray-900/70 backdrop-blur-sm rounded-lg border border-gray-700 px-2.5 py-2 w-52">
+        <p className="text-[10px] text-gray-500 uppercase tracking-widest mb-1.5">Altitude (ft)</p>
+        <div className="flex h-2.5 rounded overflow-hidden">
+          <div className="w-5 flex-shrink-0" style={{ background: '#6b7280' }} />
+          <div className="flex-1" style={{
+            background: 'linear-gradient(to right, hsl(0,90%,55%), hsl(54,90%,55%), hsl(108,90%,55%), hsl(162,90%,55%), hsl(216,90%,55%), hsl(270,90%,55%))'
+          }} />
+        </div>
+        <div className="flex justify-between text-[9px] text-gray-500 mt-1">
+          <span>Gnd</span>
+          <span>2K</span>
+          <span>10K</span>
+          <span>20K</span>
+          <span>40K+</span>
+        </div>
       </div>
 
       <InfoPanel plane={selectedPlane} onClose={onPanelClose} />
