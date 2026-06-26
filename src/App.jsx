@@ -7,7 +7,7 @@ const queryClient = new QueryClient()
 
 function AppContent() {
   const { location, error, loading } = useLocation()
-  const [selectedPlane, setSelectedPlane] = useState(null)
+  const [selectedIcao, setSelectedIcao] = useState(null)
 
   if (loading) {
     return (
@@ -31,9 +31,9 @@ function AppContent() {
   return (
     <Map
       location={location}
-      onPlaneClick={setSelectedPlane}
-      selectedPlane={selectedPlane}
-      onPanelClose={() => setSelectedPlane(null)}
+      onPlaneClick={(plane) => setSelectedIcao(plane.icao24)}
+      selectedIcao={selectedIcao}
+      onPanelClose={() => setSelectedIcao(null)}
     />
   )
 }

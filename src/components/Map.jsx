@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useRef, useState, useEffect, useCallback } from 'react'
 import { Map as MapLibre, Marker, NavigationControl, AttributionControl } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { useInterpolatedAircraft } from '../hooks/useInterpolatedAircraft'
@@ -7,9 +7,24 @@ import InfoPanel from './InfoPanel'
 
 const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json'
 
-export default function Map({ location, onPlaneClick, selectedPlane, onPanelClose }) {
+export default function Map({ location, onPlaneClick, selectedIcao, onPanelClose }) {
   const mapRef = useRef(null)
-  const { data: aircraft = [], isFetching, error } = useInterpolatedAircraft(location)
+  const [queryLocation, setQueryLocation] = useState(location)
+  const { data: aircraft = [], isFetching, error } = useInterpolatedAircraft(queryLocation)
+
+  // Derive selected plane live from the current aircraft array
+  const selectedPlane = aircraft.find((p) => p.icao24 === selectedIcao) ?? null
+
+  // Close panel if the selected aircraft goes out of range
+  useEffect(() => {
+    if (selectedIcao && !selectedPlane) onPanelClose()
+  }, [aircraft, selectedIcao, selectedPlane, onPanelClose])
+
+  // Re-query when the map is panned — fires once per drag, not per pixel
+  const handleMoveEnd = useCallback((e) => {
+    const { lat, lng } = e.target.getCenter()
+    setQueryLocation({ lat, lon: lng })
+  }, [])
 
   const isRateLimited = error?.message === 'RATE_LIMITED'
   const hasError = !!error && !isRateLimited
@@ -26,6 +41,7 @@ export default function Map({ location, onPlaneClick, selectedPlane, onPanelClos
         style={{ width: '100%', height: '100%' }}
         mapStyle={MAP_STYLE}
         attributionControl={false}
+        onMoveEnd={handleMoveEnd}
       >
         <NavigationControl position="top-right" />
         <AttributionControl
@@ -48,7 +64,7 @@ export default function Map({ location, onPlaneClick, selectedPlane, onPanelClos
             <PlaneMarker
               aircraft={plane}
               onClick={onPlaneClick}
-              selected={selectedPlane?.icao24 === plane.icao24}
+              selected={plane.icao24 === selectedIcao}
             />
           </Marker>
         ))}
