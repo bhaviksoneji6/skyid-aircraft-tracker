@@ -9,6 +9,7 @@ const MAP_STYLE = 'https://basemaps.cartocdn.com/gl/voyager-gl-style/style.json'
 
 export default function Map({ location, onPlaneClick, selectedIcao, onPanelClose }) {
   const mapRef = useRef(null)
+  const moveEndTimer = useRef(null)
   const [queryLocation, setQueryLocation] = useState(location)
   const { data: aircraft = [], isFetching, error } = useInterpolatedAircraft(queryLocation)
 
@@ -20,10 +21,14 @@ export default function Map({ location, onPlaneClick, selectedIcao, onPanelClose
     if (selectedIcao && !selectedPlane) onPanelClose()
   }, [aircraft, selectedIcao, selectedPlane, onPanelClose])
 
-  // Re-query when the map is panned — fires once per drag, not per pixel
+  // Re-query when map stops moving — debounced so rapid zoom/pan gestures
+  // don't fire multiple back-to-back API requests and trigger rate limiting
   const handleMoveEnd = useCallback((e) => {
-    const { lat, lng } = e.target.getCenter()
-    setQueryLocation({ lat, lon: lng })
+    clearTimeout(moveEndTimer.current)
+    moveEndTimer.current = setTimeout(() => {
+      const { lat, lng } = e.target.getCenter()
+      setQueryLocation({ lat, lon: lng })
+    }, 400)
   }, [])
 
   const isRateLimited = error?.message === 'RATE_LIMITED'
