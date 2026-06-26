@@ -73,12 +73,12 @@ function BizjetIcon({ color }) {
   )
 }
 
-// Diamond — unclassified / unknown aircraft type
+// Small diamond — unclassified / unknown aircraft type
 function UnknownIcon({ color }) {
   return (
     <path
       fill={color}
-      d="M12 2 L22 12 L12 22 L2 12 Z"
+      d="M12 6 L18 12 L12 18 L6 12 Z"
     />
   )
 }
