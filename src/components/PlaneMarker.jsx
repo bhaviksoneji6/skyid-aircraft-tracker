@@ -73,6 +73,16 @@ function BizjetIcon({ color }) {
   )
 }
 
+// Diamond — unclassified / unknown aircraft type
+function UnknownIcon({ color }) {
+  return (
+    <path
+      fill={color}
+      d="M12 2 L22 12 L12 22 L2 12 Z"
+    />
+  )
+}
+
 // Extreme wingspan, tiny fuselage — gliders
 function GliderIcon({ color }) {
   return (
@@ -91,6 +101,7 @@ const ICONS = {
   helicopter: HelicopterIcon,
   military: MilitaryIcon,
   glider: GliderIcon,
+  unknown: UnknownIcon,
 }
 
 export default function PlaneMarker({ aircraft, onClick, selected }) {

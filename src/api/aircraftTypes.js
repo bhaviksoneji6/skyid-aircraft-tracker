@@ -20,7 +20,9 @@ const HELI_EXACT = new Set([
   // Mil
   'MI8', 'MI17', 'MI26',
   // Military helos
-  'HH60', 'MH60', 'SH60', 'UH60', 'CH47',
+  'HH60', 'MH60', 'SH60', 'UH60', 'CH47', 'CH46',
+  // Boeing Vertol / tiltrotor
+  'H47', 'H46', 'V22', 'MV22', 'CV22',
 ])
 
 // Description substrings that only appear in helicopter aircraft names
@@ -28,6 +30,7 @@ const HELI_EXACT = new Set([
 const HELI_DESC_KEYWORDS = [
   'HELICOPTER', 'HELICOPTERS', 'ROTOR',
   'EUROCOPTER', 'ROBINSON', 'SIKORSKY', 'AGUSTA', 'GUIMBAL', 'ENSTROM',
+  'VERTOL', 'CHINOOK',
 ]
 
 // Helicopter prefix patterns
@@ -128,7 +131,7 @@ function matchesPrefix(tc, prefixes) {
   return prefixes.some((p) => tc.startsWith(p))
 }
 
-// Returns one of: 'jet' | 'bizjet' | 'turboprop' | 'light' | 'helicopter' | 'military' | 'glider'
+// Returns one of: 'jet' | 'bizjet' | 'turboprop' | 'light' | 'helicopter' | 'military' | 'glider' | 'unknown'
 export function getAircraftType(category, typecode, description) {
   const tc = typecode?.toUpperCase().trim() ?? ''
   const cat = category ?? ''
@@ -157,6 +160,9 @@ export function getAircraftType(category, typecode, description) {
   if (cat === 'A1' || cat === 'A2') return 'light'
   if (tc && (LIGHT_EXACT.has(tc) || matchesPrefix(tc, LIGHT_PREFIXES))) return 'light'
 
-  // Default: commercial airline jet (A3, A4, A5, or unknown)
-  return 'jet'
+  // Confirmed commercial/airline jet category
+  if (cat === 'A3' || cat === 'A4' || cat === 'A5') return 'jet'
+
+  // Truly unclassified — don't guess
+  return 'unknown'
 }
