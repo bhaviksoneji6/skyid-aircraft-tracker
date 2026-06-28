@@ -2,79 +2,91 @@
 
 > "What plane is above me?" — answered in real time.
 
-Open the app, allow location access, and see every aircraft currently overhead on a live map. Tap any plane to get airline, aircraft type, tail number, origin/destination, altitude, speed, registration history, and photos.
+Open the app, allow location access, and see every aircraft currently nearby on a live map. Pan to explore any area. Tap any plane to see its aircraft type, registration, altitude, speed, heading, and a real photo.
+
+**Live at:** [skyid-aircraft-tracker.vercel.app](https://skyid-aircraft-tracker.vercel.app)
 
 ---
+
+## Features
+
+- **Live aircraft map** — queries airplanes.live every 3 seconds within 150 nm of the map center
+- **Pan to explore** — data follows the map center, not just your GPS location
+- **Dead reckoning** — aircraft positions interpolate smoothly between API updates (100 ms ticks)
+- **8 aircraft symbol types** — jet, bizjet, turboprop, light GA, helicopter, military, glider, unknown
+- **Altitude color gradient** — red (low) → violet (high), 500 ft to 40,000 ft
+- **Live info panel** — tap any aircraft; altitude, speed, and heading update in real time
+- **Aircraft photo** — loaded from Planespotters.net when available
+- **FlightAware link** — one-tap to track the flight in detail
 
 ## Tech Stack
 
 | Layer | Technology |
 |---|---|
-| Frontend | React (Vite) + Tailwind CSS |
-| Map | Leaflet |
-| Data fetching | React Query |
-| Backend | Node.js + Express (Vercel serverless functions) |
-| Hosting | Vercel (connected to this repo) |
+| Frontend | React + Vite + Tailwind CSS |
+| Map | MapLibre GL JS (CARTO Voyager) via react-map-gl |
+| Data fetching | React Query (3 s polling, 10 s stale time) |
+| Proxy | Vercel serverless function (`/api/aircraft`) |
+| Hosting | Vercel |
 
 ## Data Sources
 
-| Data | Source | Cost |
+| Data | Source | API Key |
 |---|---|---|
-| Live aircraft positions | [OpenSky Network](https://opensky-network.org) | Free |
-| Flight route / origin / destination | [AviationStack](https://aviationstack.com) | Free tier (500 req/mo) |
-| Tail number / registration | [FAA Registry](https://registry.faa.gov) | Free |
-| Aircraft photos | [Planespotters.net](https://www.planespotters.net) | Free |
-
----
-
-## Build Checklist
-
-- [x] **Component 1** — Project scaffold (Vite + React + Tailwind)
-- [ ] **Component 2** — Map view with user location
-- [ ] **Component 3** — Live plane markers (OpenSky integration)
-- [ ] **Component 4** — Click a plane → info panel (callsign, altitude, speed)
-- [ ] **Component 5** — Flight route info (AviationStack)
-- [ ] **Component 6** — Tail number / registration lookup (FAA)
-- [ ] **Component 7** — Aircraft photos (Planespotters)
-- [ ] **Component 8** — Polish + deploy to Vercel
-
----
+| Live aircraft positions | [airplanes.live](https://airplanes.live) | None |
+| Aircraft photos | [Planespotters.net](https://www.planespotters.net) | None |
 
 ## Local Development
 
 ```bash
-# Clone the repo
 git clone https://github.com/bhaviksoneji6/skyid-aircraft-tracker.git
 cd skyid-aircraft-tracker
-
-# Install dependencies
 npm install
-
-# Start dev server
 npm run dev
 ```
 
----
+The Vercel proxy runs automatically in dev via `vite.config.js`. No API keys required.
 
-## Project Structure (planned)
+## Project Structure
 
 ```
 skyid-aircraft-tracker/
+├── api/
+│   └── aircraft.js              # Vercel serverless proxy → airplanes.live
 ├── src/
 │   ├── components/
-│   │   ├── Map.jsx
-│   │   ├── PlaneMarker.jsx
-│   │   └── InfoPanel.jsx
+│   │   ├── Map.jsx              # MapLibre GL, markers, altitude legend
+│   │   ├── PlaneMarker.jsx      # 8 SVG aircraft symbols + altitude color
+│   │   └── InfoPanel.jsx        # Slide-in detail panel with photo + stats
 │   ├── hooks/
-│   │   ├── useAircraft.js
-│   │   └── useLocation.js
+│   │   ├── useLocation.js       # Browser GPS
+│   │   ├── useAircraft.js       # React Query polling
+│   │   ├── useInterpolatedAircraft.js  # Dead-reckoning position smoothing
+│   │   └── useAircraftPhoto.js  # Planespotters photo query
 │   ├── api/
-│   │   ├── opensky.js
-│   │   ├── aviationstack.js
-│   │   └── faa.js
+│   │   ├── aircraft.js          # airplanes.live fetch + field mapping
+│   │   ├── aircraftTypes.js     # Symbol classification (8 types)
+│   │   ├── airlines.js          # Callsign → airline name lookup table
+│   │   └── planespotters.js     # Photo fetch
 │   └── App.jsx
-├── api/                  # Vercel serverless functions
-│   ├── aircraft.js
-│   └── flight.js
 └── README.md
 ```
+
+## Aircraft Classification
+
+Symbols are determined by combining the ADS-B `category` field, ICAO type code, and aircraft description — in that priority order. Category alone is not trusted (airplanes.live occasionally sends bad category data for law enforcement helicopters, military transports, etc.).
+
+| Symbol | Type | Detection method |
+|---|---|---|
+| Swept wings | Jet | Category A3–A5 |
+| Swept + aft pods | Bizjet | Type code (Gulfstream, Citation, Learjet…) |
+| Straight wings + pods | Turboprop | Type code (ATR, Q400, Caravan…) |
+| Straight wings + prop bar | Light GA | Category A1–A2 or type code (C172, PA28…) |
+| Rotor cross | Helicopter | Category A7, type code, or description keyword |
+| Delta | Military | Category A6 or type code (F-35, C-130, P-8…) |
+| Long thin wings | Glider | Type code only (ASW, LS, DG series…) |
+| Diamond | Unknown | No match |
+
+---
+
+Built by [Bhavik Soneji](https://github.com/bhaviksoneji6)
